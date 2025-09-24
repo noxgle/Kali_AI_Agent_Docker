@@ -2,13 +2,22 @@
 
 This project provides a Docker container for Kali Linux with SSH access, allowing secure remote connections for penetration testing and security research. Additionally, the container includes a terminal-based AI agent and chat tool installed from [noxgle/term_agent](https://github.com/noxgle/term_agent.git), providing enhanced AI-assisted interaction within the terminal environment.
 
+## Cloning the Repository
+
+To get started, clone the repository:
+
+```bash
+git clone https://github.com/noxgle/Kali_AI_Agent_Docker.git
+cd Kali_AI_Agent_Docker
+```
+
 This project uses `docker-compose` to build and run the Docker image. SSH credentials (username and password) are securely managed through a `.env` file.
 
 **Before building, create a `.env` file in the project root with the following content:**
 ```
-SSH_PASSWORD=your_password
+SSH_PASSWORD=123456
 ```
-Replace `your_password` with your desired SSH credentials for root.
+Replace `123456` with your desired SSH credentials for root.
 
 
 To build the Docker image:
