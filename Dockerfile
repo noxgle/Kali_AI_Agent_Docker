@@ -8,16 +8,21 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update and install necessary packages
 RUN apt update && apt upgrade -y && \
-    apt install -y kali-linux-headless openssh-server sudo locales git python3 python3-pip python3-venv nano && \
+    apt install -y kali-linux-headless openssh-server sudo git python3 python3-pip python3-venv nano && \
     rm -rf /var/lib/apt/lists/*
 
-# Install locales and generate pl_PL.UTF-8
-RUN echo "pl_PL.UTF-8 UTF-8" > /etc/locale.gen && \
-    locale-gen pl_PL.UTF-8
+# Update and install necessary packages
+# RUN apt update && apt upgrade -y && \
+#     apt install -y kali-linux-headless openssh-server sudo locales git python3 python3-pip python3-venv nano && \
+#     rm -rf /var/lib/apt/lists/*
 
-ENV LANG pl_PL.UTF-8
-ENV LANGUAGE pl_PL:en
-ENV LC_ALL pl_PL.UTF-8
+# Install locales and generate pl_PL.UTF-8
+# RUN echo "pl_PL.UTF-8 UTF-8" > /etc/locale.gen && \
+#     locale-gen pl_PL.UTF-8
+
+# ENV LANG pl_PL.UTF-8
+# ENV LANGUAGE pl_PL:en
+# ENV LC_ALL pl_PL.UTF-8
 
 # Generate SSH host keys
 RUN ssh-keygen -A
@@ -47,9 +52,6 @@ RUN bash -c "git clone https://github.com/noxgle/term_agent.git && \
 
 # Expose port 22 for SSH
 EXPOSE 22
-
-# Command to run SSH daemon when container starts
-#CMD ["/usr/sbin/sshd", "-D"]
 
 # Copy entrypoint script and make it executable
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
