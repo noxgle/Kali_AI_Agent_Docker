@@ -11,10 +11,6 @@ RUN apt update && apt upgrade -y && \
     apt install -y kali-linux-headless openssh-server sudo locales git python3 python3-pip python3-venv nano && \
     rm -rf /var/lib/apt/lists/*
 
-# RUN apt update && apt upgrade -y && \
-#     apt install -y openssh-server sudo locales git python3 python3-pip python3-venv && \
-#     rm -rf /var/lib/apt/lists/*
-
 # Install locales and generate pl_PL.UTF-8
 RUN echo "pl_PL.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen pl_PL.UTF-8
