@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  kali-ssh:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SSH_USERNAME: ${SSH_USERNAME}
+        SSH_PASSWORD: ${SSH_PASSWORD}
+    ports:
+      - "2222:22"
+    environment:
+      SSH_USERNAME: ${SSH_USERNAME}
+      SSH_PASSWORD: ${SSH_PASSWORD}
+    env_file:
+      - .env
+    container_name: kali-ssh-container
+    restart: unless-stopped
+    privileged: true
