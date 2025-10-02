@@ -1,3 +1,6 @@
+[![Kali AI Agent Docker Container](https://img.youtube.com/vi/nvP8HA_LTek/0.jpg)](https://youtu.be/nvP8HA_LTek)
+
+
 # Kali AI Agent Docker Container
 
 This project provides a Docker container for Kali Linux with SSH access, allowing secure remote connections for penetration testing and security research. Additionally, the container includes a terminal-based AI agent and chat tool installed from [noxgle/term_agent](https://github.com/noxgle/term_agent.git), providing enhanced AI-assisted interaction within the terminal environment.
@@ -34,7 +37,6 @@ After running, you can connect to the container via SSH:
 ```bash
 ssh root@localhost -p 2222
 ```
-Password: `${SSH_PASSWORD:-your_ssh_password_from_env}`
 
 ## Post-Installation Configuration
 
