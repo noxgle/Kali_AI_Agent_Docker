@@ -1,0 +1,90 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Get the latest commits since the last tag
+        LAST_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+        if [ -n "$LAST_TAG" ]; then
+          echo "## Changes since $LAST_TAG" >> changelog.md
+          git log --pretty=format:"- %s (%h)" $LAST_TAG..HEAD >> changelog.md
+        else
+          echo "## Initial Release" >> changelog.md
+          echo "First release of Kali AI Agent Docker" >> changelog.md
+        fi
+
+        # Add Docker-specific information
+        cat >> changelog.md << 'EOF'
+
+        ## Docker Information
+
+        ### Running the Container
+
+        ```bash
+        # Using docker-compose (recommended)
+        docker-compose up -d
+
+        # Or using docker run
+        docker run -d \
+          --name kali-ai-agent \
+          -p 2222:22 \
+          -e SSH_PASSWORD=your_password \
+          ghcr.io/${{ github.repository }}:latest
+        ```
+
+        ### SSH Access
+
+        ```bash
+        ssh root@localhost -p 2222
+        # Password: your SSH_PASSWORD
+        ```
+
+        ### Available Commands
+
+        - `ag` - Start term_ag.py AI agent
+        - `ask` - Start term_ask.py chat mode
+        - `prom` - Start PromptCreator.py
+
+        EOF
+
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        cat changelog.md >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        body: ${{ steps.changelog.outputs.changelog }}
+        draft: false
+        prerelease: false
+
+    - name: Build and push release image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          ghcr.io/${{ github.repository }}:latest
+        build-args: |
+          SSH_PASSWORD=${{ secrets.SSH_PASSWORD || 'defaultpassword' }}
