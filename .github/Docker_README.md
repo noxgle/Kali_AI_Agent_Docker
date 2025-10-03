@@ -11,7 +11,7 @@ This directory contains GitHub Actions workflows for automated Docker image buil
 - Pull requests to `main` branch
 
 **Features:**
-- ✅ Multi-platform builds (AMD64, ARM64)
+- ✅ AMD64 platform builds
 - ✅ Automated testing of built images
 - ✅ Security vulnerability scanning with Trivy
 - ✅ Docker layer caching for faster builds
@@ -83,7 +83,7 @@ The workflows run automatically when you:
 ### Docker Build Process
 
 1. **Checkout** repository code
-2. **Set up Docker Buildx** for multi-platform builds
+2. **Set up Docker Buildx** for AMD64 builds
 3. **Extract metadata** for tagging
 4. **Build and test** the image locally
 5. **Run security scan** with Trivy
@@ -103,7 +103,7 @@ The security workflow performs:
 
 1. **Generate changelog** from git commits
 2. **Create GitHub release** with Docker instructions
-3. **Build multi-platform image**
+3. **Build AMD64 image**
 4. **Push to registry** with version and latest tags
 
 ## Tagging Strategy
@@ -161,7 +161,7 @@ ghcr.io/your-username/kali_ai_agent_docker:v1.0.0
 The workflows use GitHub Actions cache backend for faster builds:
 
 - **Cache layers** between builds
-- **Multi-platform builds** in parallel
+- **AMD64 platform builds**
 - **Conditional steps** to skip unnecessary work
 
 ### Security Scanning
