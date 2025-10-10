@@ -70,7 +70,6 @@ jobs:
         # Run basic tests
         docker run --rm --name test-container kali-ai-agent:test /bin/bash -c "
           echo 'Testing SSH service...'
-          service ssh start
           sleep 2
           service ssh status | grep -q 'active' && echo '✓ SSH service is running' || exit 1
 
