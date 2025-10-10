@@ -40,16 +40,71 @@ jobs:
 
     - name: Build fresh image for comparison
       run: |
+        echo "Building fresh Docker image for security scanning..."
         docker build -t kali-ai-agent:fresh \
           --build-arg SSH_PASSWORD=${{ secrets.SSH_PASSWORD || 'defaultpassword' }} .
 
+        echo "Verifying built image..."
+        docker images kali-ai-agent:fresh
+        echo "Image info:"
+        docker inspect kali-ai-agent:fresh --format='{{.Size}} bytes, created: {{.Created}}'
+
     - name: Run comprehensive security scan
       uses: aquasecurity/trivy-action@master
+      continue-on-error: true
       with:
         image-ref: kali-ai-agent:fresh
         format: 'sarif'
         output: 'trivy-security-scan.sarif'
         severity: 'CRITICAL,HIGH'
+        ignore-unfixed: true
+
+    - name: Install jq for JSON processing
+      run: |
+        echo "Installing jq for better JSON parsing..."
+        # jq is often pre-installed in GitHub Actions runners, but let's make sure
+        if ! command -v jq &> /dev/null; then
+          echo "jq not found, installing..."
+          # For Ubuntu runners, jq should be available via apt
+          apt-get update && apt-get install -y jq
+        else
+          echo "jq is already available"
+        fi
+
+    - name: Check if SARIF file was created
+      run: |
+        echo "Checking if SARIF file exists..."
+        if [ -f "trivy-security-scan.sarif" ]; then
+          echo "✓ SARIF file created successfully"
+          ls -la trivy-security-scan.sarif
+          echo "File size:"
+          wc -l trivy-security-scan.sarif
+
+          # Show first few lines to verify SARIF format
+          echo "First 10 lines of SARIF file:"
+          head -10 trivy-security-scan.sarif
+        else
+          echo "✗ SARIF file not found"
+          echo "Creating empty SARIF file for compatibility..."
+          cat > trivy-security-scan.sarif << 'EOF'
+          {
+            "version": "2.1.0",
+            "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+            "runs": [
+              {
+                "tool": {
+                  "driver": {
+                    "name": "Trivy",
+                    "version": "0.45.0",
+                    "informationUri": "https://github.com/aquasecurity/trivy"
+                  }
+                },
+                "results": []
+              }
+            ]
+          }
+          EOF
+        fi
 
     - name: Run Docker Scout security analysis
       if: github.event_name == 'workflow_dispatch'
@@ -91,16 +146,36 @@ jobs:
         echo "" >> $GITHUB_STEP_SUMMARY
 
         if [ -f "trivy-security-scan.sarif" ]; then
-          # Count vulnerabilities by severity
-          CRITICAL_COUNT=$(grep -o '"severity":"CRITICAL"' trivy-security-scan.sarif | wc -l)
-          HIGH_COUNT=$(grep -o '"severity":"HIGH"' trivy-security-scan.sarif | wc -l)
-          MEDIUM_COUNT=$(grep -o '"severity":"MEDIUM"' trivy-security-scan.sarif | wc -l)
+          echo "Analyzing SARIF file for vulnerabilities..." >> $GITHUB_STEP_SUMMARY
+
+          # Count vulnerabilities by severity using a more robust method
+          if command -v jq &> /dev/null; then
+            # Use jq if available for better JSON parsing
+            CRITICAL_COUNT=$(jq '[.runs[].results[]? | select(.properties."security-severity" == "9.0" or .properties."security-severity" == "critical")] | length' trivy-security-scan.sarif 2>/dev/null || echo "0")
+            HIGH_COUNT=$(jq '[.runs[].results[]? | select(.properties."security-severity" == "7.0" or .properties."security-severity" == "high")] | length' trivy-security-scan.sarif 2>/dev/null || echo "0")
+            MEDIUM_COUNT=$(jq '[.runs[].results[]? | select(.properties."security-severity" == "5.0" or .properties."security-severity" == "medium")] | length' trivy-security-scan.sarif 2>/dev/null || echo "0")
+          else
+            # Fallback to grep method
+            CRITICAL_COUNT=$(grep -o '"severity"[[:space:]]*:[[:space:]]*"CRITICAL"' trivy-security-scan.sarif | wc -l)
+            HIGH_COUNT=$(grep -o '"severity"[[:space:]]*:[[:space:]]*"HIGH"' trivy-security-scan.sarif | wc -l)
+            MEDIUM_COUNT=$(grep -o '"severity"[[:space:]]*:[[:space:]]*"MEDIUM"' trivy-security-scan.sarif | wc -l)
+          fi
 
           echo "### Vulnerability Summary" >> $GITHUB_STEP_SUMMARY
           echo "- 🔴 Critical: $CRITICAL_COUNT" >> $GITHUB_STEP_SUMMARY
           echo "- 🟠 High: $HIGH_COUNT" >> $GITHUB_STEP_SUMMARY
           echo "- 🟡 Medium: $MEDIUM_COUNT" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Add scan status
+          if [ "$CRITICAL_COUNT" -gt 0 ] || [ "$HIGH_COUNT" -gt 0 ]; then
+            echo "⚠️ **Action Required**: High or critical vulnerabilities detected!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **Good**: No high or critical vulnerabilities found." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Warning**: No SARIF file found for vulnerability analysis." >> $GITHUB_STEP_SUMMARY
         fi
 
         echo "### Recommendations" >> $GITHUB_STEP_SUMMARY

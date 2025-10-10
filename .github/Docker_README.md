@@ -25,10 +25,13 @@ This directory contains GitHub Actions workflows for automated Docker image buil
 - Manual trigger via GitHub Actions tab
 
 **Features:**
-- ✅ Comprehensive security scanning
+- ✅ Comprehensive security scanning with Trivy
 - ✅ Base image update checks
 - ✅ Vulnerability reporting in GitHub Security tab
 - ✅ Docker Scout integration (on manual runs)
+- ✅ Robust error handling and fallback SARIF generation
+- ✅ Detailed vulnerability analysis and reporting
+- ✅ JSON parsing with jq for accurate vulnerability counts
 
 ### 3. Release Workflow (`release.yml`)
 
