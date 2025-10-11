@@ -39,15 +39,13 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch,enable=false
+          type=ref,event=branch
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=sha,prefix={{branch}}-,enable=false
+          type=sha,prefix={{branch}}-
           # set latest tag for default branch
           type=raw,value=latest,enable={{is_default_branch}}
-          # set branch-sha tag for non-default branches
-          type=sha,prefix={{branch}}-,enable={!is_default_branch}
 
     - name: Build and test Docker image
       uses: docker/build-push-action@v5
@@ -111,15 +109,13 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch,enable=false
+          type=ref,event=branch
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=sha,prefix={{branch}}-,enable=false
+          type=sha,prefix={{branch}}-
           # set latest tag for default branch
           type=raw,value=latest,enable={{is_default_branch}}
-          # set branch-sha tag for non-default branches
-          type=sha,prefix={{branch}}-,enable={!is_default_branch}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
