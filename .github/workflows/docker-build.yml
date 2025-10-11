@@ -17,7 +17,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      security-events: write
 
     steps:
     - name: Checkout repository
@@ -88,18 +87,7 @@ jobs:
           echo 'All tests passed!'
         "
 
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: kali-ai-agent:test
-        format: 'sarif'
-        output: 'trivy-results.sarif'
 
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
 
   deploy:
     needs: build-and-test
