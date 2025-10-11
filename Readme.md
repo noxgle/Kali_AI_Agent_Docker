@@ -14,13 +14,9 @@ git clone https://github.com/noxgle/Kali_AI_Agent_Docker.git
 cd Kali_AI_Agent_Docker
 ```
 
-This project uses `docker-compose` to build and run the Docker image. SSH credentials (username and password) are securely managed through a `.env` file.
+This project uses `docker-compose` to build and run the Docker image. The SSH password for root is set to `123456` by default in the Dockerfile (for development/testing purposes).
 
-**Before building, create a `.env` file in the project root with the following content:**
-```
-SSH_PASSWORD=123456
-```
-Replace `123456` with your desired SSH credentials for root.
+**Note:** The default password is `123456`. For production use, consider modifying the password in the Dockerfile or using Docker build secrets for better security.
 
 
 To build the Docker image:

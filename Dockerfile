@@ -1,5 +1,4 @@
 FROM kalilinux/kali-rolling
-ARG SSH_PASSWORD
 LABEL maintainer="AI Agent"
 
 
@@ -35,7 +34,7 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
     sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 # Change password for root user
-RUN echo "root:$SSH_PASSWORD" | chpasswd
+RUN echo "root:123456" | chpasswd
 
 
 RUN bash -c "git clone https://github.com/noxgle/term_agent.git && \
