@@ -39,13 +39,15 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch
+          type=ref,event=branch,enable=false
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=sha,prefix={{branch}}-
+          type=sha,prefix={{branch}}-,enable=false
           # set latest tag for default branch
           type=raw,value=latest,enable={{is_default_branch}}
+          # set branch-sha tag for non-default branches
+          type=sha,prefix={{branch}}-,enable={!is_default_branch}
 
     - name: Build and test Docker image
       uses: docker/build-push-action@v5
@@ -74,34 +76,6 @@ jobs:
           exit 1
         fi
         echo '✓ Container started successfully'
-
-        # # Wait for container to fully initialize
-        # sleep 5
-
-        # echo 'Testing SSH service...'
-        # docker exec test-container /bin/bash -c "
-        #   # Check if SSH process is running
-        #   if pgrep -f '/usr/sbin/sshd' > /dev/null; then
-        #     echo '✓ SSH service is running'
-        #   else
-        #     echo '❌ SSH service is not running'
-        #     exit 1
-        #   fi
-
-        #   echo 'Testing Python installation...'
-        #   python3 --version
-
-        #   echo 'Testing pip installation...'
-        #   pip3 --version
-
-        #   echo 'Testing git installation...'
-        #   git --version
-
-        #   echo 'Testing if term_agent directory exists...'
-        #   [ -d '/term_agent' ] && echo '✓ term_agent directory exists' || exit 1
-
-          echo 'All tests passed!'
-        #"
 
         # Clean up
         docker stop test-container || true
@@ -137,13 +111,15 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
-          type=ref,event=branch
+          type=ref,event=branch,enable=false
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=sha,prefix={{branch}}-
+          type=sha,prefix={{branch}}-,enable=false
           # set latest tag for default branch
           type=raw,value=latest,enable={{is_default_branch}}
+          # set branch-sha tag for non-default branches
+          type=sha,prefix={{branch}}-,enable={!is_default_branch}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
