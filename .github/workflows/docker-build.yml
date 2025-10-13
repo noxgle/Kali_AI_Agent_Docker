@@ -58,22 +58,22 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: |
-          SSH_PASSWORD=${{ secrets.SSH_PASSWORD || 'defaultpassword' }}
+          SSH_PASSWORD=${{ secrets.SSH_PASSWORD || '123456' }}
 
     - name: Test Docker image
       run: |
         # Build the image for testing
         docker build -t kali-ai-agent:test \
-          --build-arg SSH_PASSWORD=${{ secrets.SSH_PASSWORD || 'defaultpassword' }} .
+          --build-arg SSH_PASSWORD=${{ secrets.SSH_PASSWORD || '123456' }} .
 
         # Run basic tests
         echo 'Testing if container starts successfully...'
         CONTAINER_ID=$(docker run -d --name test-container kali-ai-agent:test)
         if [ $? -ne 0 ]; then
-          echo '❌ Failed to start container'
+          echo 'Failed to start container'
           exit 1
         fi
-        echo '✓ Container started successfully'
+        echo 'Container started successfully'
 
         # Clean up
         docker stop test-container || true
@@ -128,7 +128,7 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: |
-          SSH_PASSWORD=${{ secrets.SSH_PASSWORD || 'defaultpassword' }}
+          SSH_PASSWORD=${{ secrets.SSH_PASSWORD || '123456' }}
 
     - name: Generate artifact attestation
       if: startsWith(github.ref, 'refs/tags/')
