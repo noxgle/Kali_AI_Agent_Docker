@@ -5,6 +5,30 @@
 
 This project provides a Docker container for Kali Linux with SSH access, allowing secure remote connections for penetration testing and security research. Additionally, the container includes a terminal-based AI agent and chat tool installed from [noxgle/term_agent](https://github.com/noxgle/term_agent.git), providing enhanced AI-assisted interaction within the terminal environment.
 
+## Direct Installation from GHCR
+
+For a quick setup without cloning the repository, you can pull and run the pre-built Docker image directly from GitHub Container Registry:
+
+```bash
+# Pull the pre-built image
+docker pull ghcr.io/noxgle/kali_ai_agent_docker:main
+
+# Run the container
+docker run -d \
+  --name kali-ssh-container \
+  --restart unless-stopped \
+  --privileged \
+  -p 2222:22 \
+  ghcr.io/noxgle/kali_ai_agent_docker:main
+```
+
+After running, you can connect to the container via SSH:
+```bash
+ssh root@localhost -p 2222
+```
+
+**Note:** The default SSH password for root is `123456` (for development/testing purposes). For production use, consider changing the password after first login.
+
 ## Cloning the Repository
 
 To get started, clone the repository:
