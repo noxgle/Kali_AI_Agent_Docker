@@ -7,21 +7,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update and install necessary packages
 RUN apt update && apt upgrade -y && \
-    apt install -y kali-linux-headless openssh-server sudo git python3 python3-pip python3-venv nano && \
+    apt install -y kali-linux-headless openssh-server sudo locales git python3 python3-pip python3-venv nano && \
     rm -rf /var/lib/apt/lists/*
 
-# Update and install necessary packages
-# RUN apt update && apt upgrade -y && \
-#     apt install -y kali-linux-headless openssh-server sudo locales git python3 python3-pip python3-venv nano && \
-#     rm -rf /var/lib/apt/lists/*
+# Configure C.UTF-8 locale
+RUN echo "C.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen C.UTF-8
 
-# Install locales and generate pl_PL.UTF-8
-# RUN echo "pl_PL.UTF-8 UTF-8" > /etc/locale.gen && \
-#     locale-gen pl_PL.UTF-8
-
-# ENV LANG pl_PL.UTF-8
-# ENV LANGUAGE pl_PL:en
-# ENV LC_ALL pl_PL.UTF-8
+# Set C.UTF-8 as default locale
+ENV LANG=C.UTF-8
+ENV LANGUAGE=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 # Generate SSH host keys
 RUN ssh-keygen -A
