@@ -33,7 +33,7 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 RUN echo "root:123456" | chpasswd
 
 
-RUN bash -c "git clone -b stable-1.2.0 https://github.com/noxgle/term_agent.git && \
+RUN bash -c "git clone -b stable-1.2.4 https://github.com/noxgle/term_agent.git && \
     cd term_agent && \
     python3 -m venv .venv && \
     source .venv/bin/activate && \
