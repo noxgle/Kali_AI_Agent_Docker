@@ -3,7 +3,7 @@
 
 # Kali AI Agent Docker Container
 
-This project provides a Docker container for Kali Linux with SSH access, allowing secure remote connections for penetration testing and security research. Additionally, the container includes a terminal-based AI agent and chat tool installed from [noxgle/term_agent](https://github.com/noxgle/term_agent.git), providing enhanced AI-assisted interaction within the terminal environment.
+This project provides a Docker container for Kali Linux with SSH access, allowing secure remote connections for penetration testing and security research. Additionally, the container includes the ONE terminal-based AI agent installed from [noxgle/one](https://github.com/noxgle/one), providing enhanced AI-assisted interaction within the terminal environment.
 
 ## Direct Installation from GHCR
 
@@ -58,6 +58,66 @@ After running, you can connect to the container via SSH:
 ssh root@localhost -p 2222
 ```
 
-## Post-Installation Configuration
+## Configuration
 
-Immediately after the first SSH login (or by using `docker exec -it <container_name> bash`), you need to configure the terminal AI agent. Edit the configuration file located at `/term_agent/.env` and specify the API details with your own API key. The terminal AI agent supports Google GenAI, ChatGPT (OpenAI), and Ollama APIs - select and configure the API you prefer for authentication.
+ONE uses environment variables for API key configuration. Pass the API key when running the container:
+
+```bash
+# With OpenAI
+docker run -d \
+  --name kali-ssh-container \
+  --restart unless-stopped \
+  --privileged \
+  -p 2222:22 \
+  -e OPENAI_API_KEY=sk-your-key-here \
+  ghcr.io/noxgle/kali_ai_agent_docker:main
+
+# With Anthropic
+docker run -d \
+  --name kali-ssh-container \
+  --restart unless-stopped \
+  --privileged \
+  -p 2222:22 \
+  -e ANTHROPIC_API_KEY=sk-ant-your-key-here \
+  ghcr.io/noxgle/kali_ai_agent_docker:main
+
+# With Gemini
+docker run -d \
+  --name kali-ssh-container \
+  --restart unless-stopped \
+  --privileged \
+  -p 2222:22 \
+  -e GEMINI_API_KEY=your-gemini-key-here \
+  ghcr.io/noxgle/kali_ai_agent_docker:main
+```
+
+Supported providers: **OpenAI**, **Anthropic**, **Gemini**, **Ollama** (local), **llama.cpp** (local).
+
+For local models (Ollama/llama.cpp), set the URL via environment variable:
+```bash
+# Ollama
+docker run -d -e OLLAMA_BASE_URL=http://host-ip:11434/v1 ...
+
+# llama.cpp
+docker run -d -e LLAMA_CPP_BASE_URL=http://host-ip:8080 ...
+```
+
+## Usage Examples
+
+After connecting via SSH, you can use ONE in different modes:
+
+```bash
+# Interactive REPL mode
+one
+
+# TUI (Textual UI) mode
+one --mode tui
+
+# Headless one-shot task execution
+one run "summarize this repository"
+
+# Headless with JSON output
+one run "fix failing tests" --json
+```
+
+For more options, run `one --help` or `one --help --mode tui`.

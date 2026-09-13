@@ -33,16 +33,12 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 RUN echo "root:123456" | chpasswd
 
 
-RUN bash -c "git clone -b stable-1.2.4 https://github.com/noxgle/term_agent.git && \
-    cd term_agent && \
+RUN bash -c "git clone https://github.com/noxgle/one.git && \
+    cd one && \
     python3 -m venv .venv && \
     source .venv/bin/activate && \
     pip install --upgrade pip && \
-    pip install --upgrade google-genai && \
-    if [ -f requirements.txt ]; then \
-        pip install -r requirements.txt; \
-    fi && \
-    cp .env.copy .env"
+    pip install -e '.[dev]'"
 
 
 # Expose port 22 for SSH

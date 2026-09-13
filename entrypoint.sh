@@ -1,26 +1,23 @@
 #!/bin/bash
 
 echo "=========================================="
-echo " VAULT 3000 TERMINAL AGENT ON KALI LINUX  " 
+echo " ONE TERMINAL AGENT ON KALI LINUX       "
 echo "=========================================="
 
-# Setup aliases in .bashrc
-echo "Setting up aliases..."
-#echo "" >> /root/.bashrc
-echo "# Vault 3000 Docker aliases" >> /root/.bashrc
-echo "alias ask=\"/term_agent/.venv/bin/python /term_agent/term_ask.py\"" >> /root/.bashrc
-echo "alias ag=\"/term_agent/.venv/bin/python /term_agent/term_ag.py\"" >> /root/.bashrc
-echo "alias prom=\"/term_agent/.venv/bin/python /term_agent/PromptCreator.py\"" >> /root/.bashrc
+# Setup PATH to include one venv bin
+export PATH="/one/.venv/bin:$PATH"
 
-# Source .bashrc to activate aliases immediately
+# Source .bashrc to persist PATH
+echo "export PATH=\"/one/.venv/bin:\$PATH\"" >> /root/.bashrc
 source /root/.bashrc
 
-# Check if .env file exists
-if [ -f "/term_agent/.env" ]; then
-    echo "✓ .env file found and mounted"
+# Check if API key is configured
+if [ -z "$OPENAI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ] && [ -z "$GEMINI_API_KEY" ]; then
+    echo "! Warning: No API key configured!"
+    echo "  Set one of: OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY"
+    echo "  Example: docker-compose up -d -e OPENAI_API_KEY=sk-..."
 else
-    echo "! Warning: .env file not found. Please mount your .env file with API keys"
-    echo "  Example: docker-compose up -d"
+    echo "✓ API key detected and configured"
 fi
 
 # Display helpful information
@@ -31,9 +28,15 @@ echo "  Password: 123456"
 echo "  Port: 22 (mapped to host port 2222)"
 echo ""
 echo "Available Commands:"
-echo "  ag              - Start term_ag.py AI agent"
-echo "  ask             - Start term_ask.py chat mode"
-echo "  prom            - Start PromptCreator.py"
+echo "  one              - Start ONE terminal agent"
+echo "  one run \"task\"   - Run a task headlessly"
+echo "  one --mode tui   - Start TUI (textual UI)"
+echo "  one --mode text  - Start REPL mode"
+echo ""
+echo "Configuration:"
+echo "  Set API key via environment variable:"
+echo "    OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY,"
+echo "    OLLAMA_BASE_URL (for local Ollama)"
 echo ""
 echo "Connection Example:"
 echo "  ssh root@localhost -p 2222"
