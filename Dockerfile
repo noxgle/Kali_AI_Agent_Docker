@@ -40,6 +40,21 @@ RUN bash -c "git clone https://github.com/noxgle/one.git && \
     pip install --upgrade pip && \
     pip install -e '.[dev]'"
 
+# Install the web-deepsearch MCP server after ONE. Pin the reviewed revision
+# so builds keep using the same server source until this value is updated.
+RUN git clone https://github.com/noxgle/mcp-web-deepsearch.git /mcp-web-deepsearch && \
+    git -C /mcp-web-deepsearch checkout d9dc89e359cfed054954c068baa7decf271112ff && \
+    python3 -m venv /mcp-web-deepsearch/.venv && \
+    /mcp-web-deepsearch/.venv/bin/pip install --upgrade pip && \
+    /mcp-web-deepsearch/.venv/bin/pip install --no-cache-dir -r /mcp-web-deepsearch/server/requirements.txt && \
+    printf '%s\n' '#!/bin/sh' 'exec /mcp-web-deepsearch/.venv/bin/python /mcp-web-deepsearch/server/mcp_server.py "$@"' \
+      > /usr/local/bin/web-deepsearch-mcp && \
+    chmod +x /usr/local/bin/web-deepsearch-mcp && \
+    mkdir -p /root/.config/one && \
+    printf '%s\n' '{' '  "mcpServers": {' '    "web-deepsearch": {' '      "command": "/usr/local/bin/web-deepsearch-mcp",' '      "args": [],' '      "enabled": true' '    }' '  }' '}' \
+      > /root/.config/one/settings.json && \
+    chmod 600 /root/.config/one/settings.json
+
 
 # Expose port 22 for SSH
 EXPOSE 22
