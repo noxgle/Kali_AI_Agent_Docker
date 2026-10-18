@@ -33,7 +33,7 @@ RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/
 RUN echo "root:123456" | chpasswd
 
 
-RUN bash -c "git clone https://github.com/noxgle/one.git && \
+RUN bash -c "git clone --branch v0.1.85 --depth 1 https://github.com/noxgle/one.git && \
     cd one && \
     python3 -m venv .venv && \
     source .venv/bin/activate && \
